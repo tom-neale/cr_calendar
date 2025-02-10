@@ -418,7 +418,7 @@ class _CrDatePickerDialogState extends State<CrDatePickerDialog> {
       return Contract.kYearsInLine;
     }
     final yearInLine =
-        (_properties.minDate!.year) - (_properties.maxDate!.year);
+        (_properties.maxDate!.year) - (_properties.minDate!.year);
     return yearInLine == 0 ? 1 : yearInLine;
   }
 }
