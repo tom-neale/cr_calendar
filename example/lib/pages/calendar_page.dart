@@ -155,8 +155,8 @@ class _CalendarPageState extends State<CalendarPage> {
       events: [
         CalendarEventModel(
           name: '1 event',
-          begin: DateTime(now.year, now.month, (now.day).clamp(1, 28)),
-          end: DateTime(now.year, now.month, (now.day).clamp(1, 28)),
+          begin: DateTime(now.year, now.month, now.day.clamp(1, 28)),
+          end: DateTime(now.year, now.month, now.day.clamp(1, 28)),
           eventColor: eventColors[0],
         ),
         CalendarEventModel(
@@ -173,7 +173,7 @@ class _CalendarPageState extends State<CalendarPage> {
         ),
         CalendarEventModel(
           name: '4 event',
-          begin: DateTime(now.year, now.month - 1, (now.day).clamp(1, 28)),
+          begin: DateTime(now.year, now.month - 1, now.day.clamp(1, 28)),
           end: DateTime(now.year, now.month + 1, (now.day + 5).clamp(1, 28)),
           eventColor: eventColors[3],
         ),

@@ -85,7 +85,8 @@ class _YearPickerWidgetState extends State<YearPickerWidget> {
           _pickedYear = year;
           widget.onYearTap?.call(year);
         },
-        child: widget.yearPickerItemBuilder?.call(year, _isPicked(year)) ??
+        child: widget.yearPickerItemBuilder
+                ?.call(year, isSelected: _isPicked(year)) ??
             Center(
               child: Container(
                 padding: const EdgeInsets.all(6),

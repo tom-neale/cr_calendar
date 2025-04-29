@@ -1,5 +1,4 @@
 import 'package:cr_calendar/src/contract.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../cr_calendar.dart';
@@ -23,7 +22,7 @@ class DefaultWeekdayWidget extends StatelessWidget {
       height: 40,
       child: Center(
         child: Text(
-          describeEnum(day).substring(0, 1).toUpperCase(),
+          day.name.substring(0, 1).toUpperCase(),
         ),
       ),
     );

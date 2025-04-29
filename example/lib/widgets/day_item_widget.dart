@@ -15,7 +15,7 @@ class DayItemWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-          border: Border.all(color: violet.withOpacity(0.3), width: 0.3)),
+          border: Border.all(color: violet.withValues(alpha: 0.3), width: 0.3)),
       child: Stack(
         children: [
           Container(
@@ -31,10 +31,8 @@ class DayItemWidget extends StatelessWidget {
               child: Center(
                 child: Text('${properties.dayNumber}',
                     style: TextStyle(
-                        color: properties.isCurrentDay
-                            ? Colors.white
-                            : violet
-                                .withOpacity(properties.isInMonth ? 1 : 0.5))),
+                        color: properties.isCurrentDay ? Colors.white : violet
+                          ..withValues(alpha: properties.isInMonth ? 1 : 0.5))),
               ),
             ),
           ),
@@ -45,8 +43,8 @@ class DayItemWidget extends StatelessWidget {
               child: Text('+${properties.notFittedEventsCount}',
                   style: TextStyle(
                       fontSize: 10,
-                      color:
-                          violet.withOpacity(properties.isInMonth ? 1 : 0.5))),
+                      color: violet
+                        ..withValues(alpha: properties.isInMonth ? 1 : 0.5))),
             ),
         ],
       ),

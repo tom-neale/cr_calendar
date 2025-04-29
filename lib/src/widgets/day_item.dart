@@ -86,7 +86,11 @@ class DayItem extends StatelessWidget {
     } else {
       return isWithinMonth
           ? Theme.of(context).textTheme.bodySmall?.color
-          : Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.75);
+          : Theme.of(context)
+              .textTheme
+              .bodySmall
+              ?.color
+              ?.withValues(alpha: 0.75);
     }
   }
 }

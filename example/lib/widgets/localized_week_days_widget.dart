@@ -26,7 +26,7 @@ class LocalizedWeekDaysWidget extends StatelessWidget {
         child: Text(
           weekDay,
           style: TextStyle(
-            color: violet.withOpacity(0.9),
+            color: violet.withValues(alpha: 0.9),
           ),
         ),
       ),

@@ -12,7 +12,7 @@ typedef DayItemBuilder = Widget Function(DayItemProperties properties);
 typedef EventBuilder = Widget Function(EventProperties eventDrawer);
 
 /// Builder for [YearPickerWidget] item.
-typedef YearPickerItemBuilder = Widget Function(int year, bool isSelected);
+typedef YearPickerItemBuilder = Widget Function(int year, {bool isSelected});
 
 /// Builder for [CrDatePickerDialog] title over calendar widget and in control bar.
 typedef DateTitleBuilder = Widget Function(DateTime date);

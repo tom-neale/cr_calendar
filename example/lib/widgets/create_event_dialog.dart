@@ -62,12 +62,12 @@ class _CreateEventDialogState extends State<CreateEventDialog> {
                   cursorColor: violet,
                   style: const TextStyle(color: violet, fontSize: 16),
                   decoration: InputDecoration(
-                    enabledBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: violet.withOpacity(1)),
+                    enabledBorder: const UnderlineInputBorder(
+                      borderSide: BorderSide(color: violet),
                     ),
                     hintText: 'Enter the event name',
-                    hintStyle:
-                        TextStyle(color: violet.withOpacity(0.6), fontSize: 16),
+                    hintStyle: TextStyle(
+                        color: violet.withValues(alpha: 0.6), fontSize: 16),
                   ),
                   controller: _eventNameController,
                 ),
@@ -102,7 +102,8 @@ class _CreateEventDialogState extends State<CreateEventDialog> {
                               foregroundDecoration: BoxDecoration(
                                 border: index == _selectedColorIndex
                                     ? Border.all(
-                                        color: Colors.black.withOpacity(0.3),
+                                        color: Colors.black
+                                          ..withValues(alpha: 0.3),
                                         width: 2)
                                     : null,
                                 shape: BoxShape.circle,
@@ -237,17 +238,18 @@ class _CreateEventDialogState extends State<CreateEventDialog> {
         weekDaysBuilder: (day) => WeekDaysWidget(day: day),
         initialPickerDate: _beginDate ?? DateTime.now(),
         pickerTitleBuilder: (date) => DatePickerTitle(date: date),
-        yearPickerItemBuilder: (year, isPicked) => Container(
+        yearPickerItemBuilder: (int year, {bool isSelected = false}) =>
+            Container(
           height: 24,
           width: 54,
           decoration: BoxDecoration(
-            color: isPicked ? violet : Colors.white,
+            color: isSelected ? violet : Colors.white,
             borderRadius: const BorderRadius.all(Radius.circular(8)),
           ),
           child: Center(
             child: Text(year.toString(),
                 style: TextStyle(
-                    color: isPicked ? Colors.white : violet, fontSize: 16)),
+                    color: isSelected ? Colors.white : violet, fontSize: 16)),
           ),
         ),
         controlBarTitleBuilder: (date) => Text(
