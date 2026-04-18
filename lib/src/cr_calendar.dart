@@ -4,6 +4,7 @@ import 'package:cr_calendar/src/extensions/datetime_ext.dart';
 import 'package:cr_calendar/src/models/calendar_event_model.dart';
 import 'package:cr_calendar/src/month_item.dart';
 import 'package:cr_calendar/src/utils/debouncer.dart';
+import 'package:cr_calendar/src/week_events_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:jiffy/jiffy.dart';
 
@@ -218,6 +219,8 @@ class CrCalendar extends StatefulWidget {
     this.maxDate,
     this.weeksToShow,
     this.localizedWeekDaysBuilder,
+    this.onEventHover,
+    this.bandRange,
     super.key,
   })  : assert(maxEventLines <= 6, 'maxEventLines should be less then 6'),
         assert(minDate == null || maxDate == null || minDate.isBefore(maxDate),
@@ -309,6 +312,24 @@ class CrCalendar extends StatefulWidget {
   /// When this parameter is not null, [firstDayOfWeek] and [weekDaysBuilder]
   /// parameters are ignored.
   final LocalizedWeekDaysBuilder? localizedWeekDaysBuilder;
+
+  /// Optional callback fired when the pointer enters or leaves an event bar.
+  /// The argument is the [CalendarEventModel.id] of the hovered event, or
+  /// null when the pointer has left any bar. Requires events to have been
+  /// created with an `id`; events without one will surface as null.
+  ///
+  /// When supplied, event bars become interactive (the internal
+  /// `IgnorePointer` that normally wraps the overlay is lifted), so the
+  /// host app can paint hover-emphasised bars via a custom
+  /// [eventBuilder] that reads the current hover state.
+  final EventHoverCallback? onEventHover;
+
+  /// Optional date range that the host wants to visually flag across the
+  /// calendar (e.g. a rolling-window highlight). When supplied, every day
+  /// cell inside `[bandRange.begin .. bandRange.end]` receives
+  /// `DayItemProperties.isInBand == true`, and the host's [dayItemBuilder]
+  /// can paint a tinted background for those cells.
+  final DateRangeModel? bandRange;
 
   @override
   _CrCalendarState createState() => _CrCalendarState();
@@ -403,6 +424,8 @@ class _CrCalendarState extends State<CrCalendar> {
                 weeksToShow: widget.weeksToShow,
                 firstWeekDay: _firstWeekDay,
                 localizedWeekDaysBuilder: widget.localizedWeekDaysBuilder,
+                onEventHover: widget.onEventHover,
+                bandRange: widget.bandRange,
               ),
             );
           },

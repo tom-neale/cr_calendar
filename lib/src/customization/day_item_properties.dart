@@ -16,6 +16,7 @@ final class DayItemProperties {
     required this.isFirstInRange,
     required this.isLastInRange,
     required this.date,
+    this.isInBand = false,
   });
 
   final int dayNumber;
@@ -27,4 +28,10 @@ final class DayItemProperties {
   final bool isFirstInRange;
   final bool isLastInRange;
   final DateTime date;
+
+  /// True when this day falls within the `bandRange` supplied to
+  /// [CrCalendar]. Host apps can use this from [DayItemBuilder] to paint
+  /// a subtle background tint across the range (e.g. a rolling-window
+  /// highlight). Ignored when no `bandRange` is supplied — always false.
+  final bool isInBand;
 }

@@ -3,6 +3,11 @@ import 'package:cr_calendar/src/customization/builders.dart';
 import 'package:cr_calendar/src/models/drawers.dart';
 import 'package:flutter/material.dart';
 
+/// Callback fired when the pointer enters or leaves an event bar.
+/// [id] is the [CalendarEventModel.id] that was supplied for the hovered
+/// event, or null when the pointer has left any bar.
+typedef EventHoverCallback = void Function(String? id);
+
 class WeekEventsWidget extends StatelessWidget {
   WeekEventsWidget({
     required this.itemHeight,
@@ -12,6 +17,7 @@ class WeekEventsWidget extends StatelessWidget {
     this.topPadding = 0,
     this.row = 0,
     this.eventBuilder,
+    this.onEventHover,
     EdgeInsets? padding,
     super.key,
   }) {
@@ -26,6 +32,11 @@ class WeekEventsWidget extends StatelessWidget {
   final List<EventsLineDrawer> eventLines;
   late final EdgeInsets padding;
   final EventBuilder? eventBuilder;
+
+  /// Optional pointer-hover callback. Host apps can use this to
+  /// cross-highlight external UI (e.g. a trip pill in a detail panel)
+  /// when the user hovers over a bar.
+  final EventHoverCallback? onEventHover;
 
   @override
   Widget build(BuildContext context) {
@@ -44,32 +55,39 @@ class WeekEventsWidget extends StatelessWidget {
     for (var i = 0; i < eventLines.length; i++) {
       for (var j = 0; j < eventLines[i].events.length; j++) {
         final item = eventLines[i].events[j];
+        final bar = Container(
+          height:
+              lineHeight - itemHeight / Contract.kDistanceBetweenEventsCoef,
+          width: itemWidth * item.size() - Contract.kLinesPadding,
+          child: eventBuilder != null
+              ? eventBuilder?.call(item)
+              : Container(
+                  color: item.backgroundColor,
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  child: FittedBox(
+                    fit: BoxFit.fitHeight,
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      item.name,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ),
+        );
         widgets.add(
           Positioned(
             top: i * lineHeight,
             left: (item.begin - 1) * itemWidth + padding.left,
             right: (Contract.kWeekDaysCount - item.end) * itemWidth +
                 padding.right,
-            child: Container(
-              height:
-                  lineHeight - itemHeight / Contract.kDistanceBetweenEventsCoef,
-              width: itemWidth * item.size() - Contract.kLinesPadding,
-              child: eventBuilder != null
-                  ? eventBuilder?.call(item)
-                  : Container(
-                      color: item.backgroundColor,
-                      padding: const EdgeInsets.symmetric(horizontal: 4),
-                      child: FittedBox(
-                        fit: BoxFit.fitHeight,
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          item.name,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(color: Colors.white),
-                        ),
-                      ),
-                    ),
-            ),
+            child: onEventHover == null
+                ? bar
+                : MouseRegion(
+                    onEnter: (_) => onEventHover?.call(item.id),
+                    onExit: (_) => onEventHover?.call(null),
+                    child: bar,
+                  ),
           ),
         );
       }

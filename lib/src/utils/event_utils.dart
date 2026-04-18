@@ -104,7 +104,8 @@ EventProperties? _mapSimpleEventToDrawerOrNull(
       begin: beginDay,
       end: endDay,
       name: event.name,
-      backgroundColor: event.eventColor);
+      backgroundColor: event.eventColor,
+      id: event.id);
 }
 
 /// Map EventDrawers to EventsLineDrawer and sort them by duration on current week

@@ -15,6 +15,7 @@ class EventsOverlay extends StatelessWidget {
     required this.maxLines,
     this.padding,
     this.eventBuilder,
+    this.onEventHover,
     super.key,
   });
 
@@ -26,6 +27,7 @@ class EventsOverlay extends StatelessWidget {
   final int maxLines;
   final EdgeInsets? padding;
   final EventBuilder? eventBuilder;
+  final EventHoverCallback? onEventHover;
 
   @override
   Widget build(BuildContext context) {
@@ -44,6 +46,7 @@ class EventsOverlay extends StatelessWidget {
           topPadding: topPadding,
           lineHeight: lineHeight,
           padding: padding,
+          onEventHover: onEventHover,
         );
       },
     );

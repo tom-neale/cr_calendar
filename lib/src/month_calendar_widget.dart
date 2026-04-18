@@ -30,6 +30,7 @@ class MonthCalendarWidget extends StatefulWidget {
     this.currentDay,
     this.dayItemBuilder,
     this.onDayTap,
+    this.bandRange,
     super.key,
   });
 
@@ -49,6 +50,11 @@ class MonthCalendarWidget extends StatefulWidget {
   final Function(List<CalendarEventModel>)? onRangeSelected;
   final TouchMode touchMode;
   final List<int> weeksToShow;
+
+  /// Optional date range to flag on each day cell via
+  /// [DayItemProperties.isInBand]. Host apps use this to paint a
+  /// background tint across the range from their [DayItemBuilder].
+  final DateRangeModel? bandRange;
 
   @override
   MonthCalendarWidgetState createState() => MonthCalendarWidgetState();
@@ -109,6 +115,22 @@ class MonthCalendarWidgetState extends State<MonthCalendarWidget> {
   bool _isDateFirstRange(int index) => index == _selectedRangeIndices?.first;
 
   bool _isDateLastRange(int index) => index == _selectedRangeIndices?.second;
+
+  /// Whether [date] falls inside the optional highlight band supplied via
+  /// [MonthCalendarWidget.bandRange]. Compares by calendar day, ignoring
+  /// time-of-day. Inclusive of both endpoints.
+  bool _isInBand(DateTime date) {
+    final range = widget.bandRange;
+    final begin = range?.begin;
+    final end = range?.end;
+    if (begin == null || end == null) {
+      return false;
+    }
+    final d = DateTime.utc(date.year, date.month, date.day);
+    final b = DateTime.utc(begin.year, begin.month, begin.day);
+    final e = DateTime.utc(end.year, end.month, end.day);
+    return !d.isBefore(b) && !d.isAfter(e);
+  }
 
   /// Checks if day is selected
   bool _isSelectedDate(int index) {
@@ -188,6 +210,7 @@ class MonthCalendarWidgetState extends State<MonthCalendarWidget> {
                     isFirstInRange: _isDateFirstRange(index),
                     isLastInRange: _isDateLastRange(index),
                     date: tappedDate.dateTime,
+                    isInBand: _isInBand(tappedDate.dateTime),
                   ),
                 )
               : DayItem(

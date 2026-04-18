@@ -30,6 +30,8 @@ class MonthItem extends StatefulWidget {
     this.firstWeekDay = WeekDay.sunday,
     this.weeksToShow,
     this.localizedWeekDaysBuilder,
+    this.onEventHover,
+    this.bandRange,
     super.key,
   });
 
@@ -49,6 +51,8 @@ class MonthItem extends StatefulWidget {
   final WeekDay firstWeekDay;
   final List<int>? weeksToShow;
   final LocalizedWeekDaysBuilder? localizedWeekDaysBuilder;
+  final EventHoverCallback? onEventHover;
+  final DateRangeModel? bandRange;
 
   @override
   MonthItemState createState() => MonthItemState();
@@ -148,19 +152,11 @@ class MonthItemState extends State<MonthItem> {
                                   itemWidth,
                                   itemHeight,
                                 ),
-                                IgnorePointer(
-                                  child: EventsOverlay(
-                                    eventBuilder: widget.eventBuilder,
-                                    maxLines: widget.maxEventLines,
-                                    topPadding: widget.eventTopPadding ??
-                                        (itemHeight /
-                                            Contract.kDayItemTopPaddingCoef),
-                                    itemWidth: itemWidth,
-                                    itemHeight: itemHeight,
-                                    begin: _beginRange,
-                                    weekList: _weeksEvents,
-                                  ),
-                                ),
+                                // When onEventHover is supplied, the overlay
+                                // must receive pointer events so MouseRegion
+                                // can fire; otherwise preserve the original
+                                // pointer-through behaviour.
+                                _buildEventsLayer(itemWidth, itemHeight),
                               ],
                             );
                     },
@@ -195,6 +191,29 @@ class MonthItemState extends State<MonthItem> {
     return Size(itemWidth, itemHeight);
   }
 
+  /// Build the events layer. When [MonthItem.onEventHover] is supplied the
+  /// overlay receives pointer events so MouseRegion on bars can fire;
+  /// otherwise it's wrapped in [IgnorePointer] to preserve pre-patch
+  /// tap-through behaviour.
+  Widget _buildEventsLayer(double itemWidth, double itemHeight) {
+    final topPadding = widget.eventTopPadding ??
+        (itemHeight / Contract.kDayItemTopPaddingCoef);
+    final overlay = EventsOverlay(
+      eventBuilder: widget.eventBuilder,
+      maxLines: widget.maxEventLines,
+      topPadding: topPadding,
+      itemWidth: itemWidth,
+      itemHeight: itemHeight,
+      begin: _beginRange,
+      weekList: _weeksEvents,
+      onEventHover: widget.onEventHover,
+    );
+    if (widget.onEventHover != null) {
+      return overlay;
+    }
+    return IgnorePointer(child: overlay);
+  }
+
   /// Builds MonthCalendarWidget
   MonthCalendarWidget _getMonthCalendarWidget(
       double itemWidth, double itemHeight) {
@@ -216,6 +235,7 @@ class MonthItemState extends State<MonthItem> {
       onRangeSelected: widget.onRangeSelected,
       touchMode: widget.touchMode,
       weeksToShow: widget.weeksToShow ?? Contract.kWeeksToShowInMonth,
+      bandRange: widget.bandRange,
     );
   }
 

@@ -20,6 +20,7 @@ final class EventProperties {
     required this.end,
     required this.name,
     required this.backgroundColor,
+    this.id,
   });
 
   /// Begin day number.
@@ -31,6 +32,10 @@ final class EventProperties {
 
   /// Name displayed at start of the event widget.
   String name;
+
+  /// Optional stable identifier, forwarded from [CalendarEventModel.id].
+  /// Null for events that weren't given an id.
+  String? id;
 
   int size() => end - begin + 1;
 }
