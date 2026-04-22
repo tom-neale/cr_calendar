@@ -208,6 +208,7 @@ class CrCalendar extends StatefulWidget {
     this.firstDayOfWeek = WeekDay.sunday,
     this.dayItemBuilder,
     this.forceSixWeek = false,
+    this.autoScrollOnUnboundMonth = true,
     this.maxEventLines = 4,
     this.backgroundColor,
     this.eventBuilder,
@@ -270,6 +271,16 @@ class CrCalendar extends StatefulWidget {
   /// Force calendar to display sixth row in month view even if this week is
   /// not in current month.
   final bool forceSixWeek;
+
+  /// When `true` (default), tapping a day that belongs to a leading or
+  /// trailing month (rendered as dim cells around the current month) auto-
+  /// swipes the grid to that day's month via [_scrollOnUnboundMonth].
+  ///
+  /// Set to `false` to treat such taps as pure selection events — the
+  /// [onDayClicked] callback still fires, but the visible month does not
+  /// change. Useful when the consumer wants adjacent-month days to act as
+  /// selection targets without repositioning the viewport.
+  final bool autoScrollOnUnboundMonth;
 
   /// Background color of calendar.
   final Color? backgroundColor;
@@ -400,7 +411,9 @@ class _CrCalendarState extends State<CrCalendar> {
                 currentDay: _returnCurrentDayForDateOrNull(month),
                 touchMode: widget.touchMode,
                 onDayTap: (day) {
-                  _scrollOnUnboundMonth(day);
+                  if (widget.autoScrollOnUnboundMonth) {
+                    _scrollOnUnboundMonth(day);
+                  }
                 },
                 onRangeSelected: (events) {
                   final begin = widget.controller.selectedRange.begin;

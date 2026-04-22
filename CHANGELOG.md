@@ -1,3 +1,10 @@
+## Unreleased
+
+- Add `autoScrollOnUnboundMonth` bool to `CrCalendar` (default `true`).
+  When `false`, tapping a leading/trailing day does not swipe the grid —
+  `onDayClicked` still fires so the day can be selected without changing
+  the visible month.
+
 # 1.2.1
 
 - Updated dependencies
