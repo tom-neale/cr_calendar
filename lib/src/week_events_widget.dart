@@ -48,9 +48,15 @@ class WeekEventsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // The container keeps its full per-week height (itemHeight -
+    // topPadding) so each week's allocation in the ListView still
+    // aligns with the day-cell grid below. bottomPadding reduces only
+    // the LINE height (in EventsOverlay), so bars stop short of the
+    // cell bottom by the reserved amount, leaving the bottom strip
+    // empty for the host's overflow indicator.
     return Container(
       margin: EdgeInsets.only(top: topPadding),
-      height: itemHeight - topPadding - bottomPadding,
+      height: itemHeight - topPadding,
       child: Stack(
         children: _makePositionedEvents(),
       ),
