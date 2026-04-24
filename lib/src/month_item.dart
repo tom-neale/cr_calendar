@@ -27,6 +27,7 @@ class MonthItem extends StatefulWidget {
     this.touchMode = TouchMode.singleTap,
     this.eventTopPadding = 0,
     this.eventBottomPadding = 0,
+    this.eventBottomPaddingBuilder,
     this.onDayTap,
     this.firstWeekDay = WeekDay.sunday,
     this.weeksToShow,
@@ -53,6 +54,12 @@ class MonthItem extends StatefulWidget {
   /// extend into this region. Useful when the host renders an overflow
   /// indicator (e.g. "+N more") in the cell's bottom slice.
   final double eventBottomPadding;
+
+  /// Optional dynamic-padding builder. Computed per-frame from the
+  /// actual `itemHeight` and `maxLines` if supplied — takes
+  /// precedence over the static [eventBottomPadding].
+  final double Function(double itemHeight, int maxLines)?
+      eventBottomPaddingBuilder;
 
   final TouchMode touchMode;
   final WeekDay firstWeekDay;
@@ -205,11 +212,14 @@ class MonthItemState extends State<MonthItem> {
   Widget _buildEventsLayer(double itemWidth, double itemHeight) {
     final topPadding = widget.eventTopPadding ??
         (itemHeight / Contract.kDayItemTopPaddingCoef);
+    final bottomPadding = widget.eventBottomPaddingBuilder
+            ?.call(itemHeight, widget.maxEventLines) ??
+        widget.eventBottomPadding;
     final overlay = EventsOverlay(
       eventBuilder: widget.eventBuilder,
       maxLines: widget.maxEventLines,
       topPadding: topPadding,
-      bottomPadding: widget.eventBottomPadding,
+      bottomPadding: bottomPadding,
       itemWidth: itemWidth,
       itemHeight: itemHeight,
       begin: _beginRange,

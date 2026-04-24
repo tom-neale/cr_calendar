@@ -215,6 +215,7 @@ class CrCalendar extends StatefulWidget {
     this.touchMode = TouchMode.singleTap,
     this.eventsTopPadding = 12.0,
     this.eventsBottomPadding = 0,
+    this.eventsBottomPaddingBuilder,
     this.onRangeSelected,
     this.onSwipeCallbackDebounceMs = 100,
     this.minDate,
@@ -298,7 +299,20 @@ class CrCalendar extends StatefulWidget {
   /// host renders a custom indicator (e.g. an "+N more" overflow chip)
   /// in the cell's bottom slice and needs the events overlay to leave
   /// that region untouched.
+  ///
+  /// When [eventsBottomPaddingBuilder] is also provided it takes
+  /// precedence — useful when the desired reserve depends on the
+  /// actual rendered cell height.
   final double eventsBottomPadding;
+
+  /// Optional builder that computes [eventsBottomPadding] dynamically
+  /// from the per-frame `itemHeight` and `maxLines`. Takes precedence
+  /// over [eventsBottomPadding] when supplied. Use when the bottom
+  /// reserve must equal the bar height (e.g. so an overflow chip
+  /// rendered by the host has the same vertical footprint as a real
+  /// bar regardless of how the calendar resizes).
+  final double Function(double itemHeight, int maxLines)?
+      eventsBottomPaddingBuilder;
 
   /// Touch mode of calendar.
   ///
@@ -413,6 +427,7 @@ class _CrCalendarState extends State<CrCalendar> {
               child: MonthItem(
                 eventTopPadding: widget.eventsTopPadding,
                 eventBottomPadding: widget.eventsBottomPadding,
+                eventBottomPaddingBuilder: widget.eventsBottomPaddingBuilder,
                 displayMonth: month,
                 controller: widget.controller,
                 eventBuilder: widget.eventBuilder,
