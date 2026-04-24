@@ -15,6 +15,7 @@ class WeekEventsWidget extends StatelessWidget {
     required this.eventLines,
     required this.lineHeight,
     this.topPadding = 0,
+    this.bottomPadding = 0,
     this.row = 0,
     this.eventBuilder,
     this.onEventHover,
@@ -28,6 +29,13 @@ class WeekEventsWidget extends StatelessWidget {
   final double itemHeight;
   final double itemWidth;
   final double topPadding;
+
+  /// Vertical padding reserved at the bottom of each cell — bars never
+  /// extend into this region, so a host can paint custom content there
+  /// (e.g. an overflow indicator chip) without the events overlay
+  /// covering it.
+  final double bottomPadding;
+
   final int row;
   final List<EventsLineDrawer> eventLines;
   late final EdgeInsets padding;
@@ -42,7 +50,7 @@ class WeekEventsWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: EdgeInsets.only(top: topPadding),
-      height: itemHeight - topPadding,
+      height: itemHeight - topPadding - bottomPadding,
       child: Stack(
         children: _makePositionedEvents(),
       ),

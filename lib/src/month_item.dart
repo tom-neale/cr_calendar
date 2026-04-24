@@ -26,6 +26,7 @@ class MonthItem extends StatefulWidget {
     this.onRangeSelected,
     this.touchMode = TouchMode.singleTap,
     this.eventTopPadding = 0,
+    this.eventBottomPadding = 0,
     this.onDayTap,
     this.firstWeekDay = WeekDay.sunday,
     this.weeksToShow,
@@ -47,6 +48,12 @@ class MonthItem extends StatefulWidget {
   final CrCalendarController controller;
   final DateTime displayMonth;
   final double? eventTopPadding;
+
+  /// Vertical padding reserved at the bottom of each cell — bars never
+  /// extend into this region. Useful when the host renders an overflow
+  /// indicator (e.g. "+N more") in the cell's bottom slice.
+  final double eventBottomPadding;
+
   final TouchMode touchMode;
   final WeekDay firstWeekDay;
   final List<int>? weeksToShow;
@@ -202,6 +209,7 @@ class MonthItemState extends State<MonthItem> {
       eventBuilder: widget.eventBuilder,
       maxLines: widget.maxEventLines,
       topPadding: topPadding,
+      bottomPadding: widget.eventBottomPadding,
       itemWidth: itemWidth,
       itemHeight: itemHeight,
       begin: _beginRange,

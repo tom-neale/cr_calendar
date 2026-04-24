@@ -13,6 +13,7 @@ class EventsOverlay extends StatelessWidget {
     required this.topPadding,
     required this.itemHeight,
     required this.maxLines,
+    this.bottomPadding = 0,
     this.padding,
     this.eventBuilder,
     this.onEventHover,
@@ -24,6 +25,13 @@ class EventsOverlay extends StatelessWidget {
   final double itemWidth;
   final double itemHeight;
   final double topPadding;
+
+  /// Vertical padding reserved at the bottom of each cell — bars never
+  /// extend into this region, so a host can paint custom content there
+  /// (e.g. an overflow indicator chip) without the events overlay
+  /// covering it.
+  final double bottomPadding;
+
   final int maxLines;
   final EdgeInsets? padding;
   final EventBuilder? eventBuilder;
@@ -35,7 +43,8 @@ class EventsOverlay extends StatelessWidget {
       physics: const NeverScrollableScrollPhysics(),
       itemCount: weekList.length,
       itemBuilder: (context, index) {
-        final lineHeight = (itemHeight - topPadding) / maxLines;
+        final lineHeight =
+            (itemHeight - topPadding - bottomPadding) / maxLines;
 
         return WeekEventsWidget(
           eventBuilder: eventBuilder,
@@ -44,6 +53,7 @@ class EventsOverlay extends StatelessWidget {
           itemHeight: itemHeight,
           itemWidth: itemWidth,
           topPadding: topPadding,
+          bottomPadding: bottomPadding,
           lineHeight: lineHeight,
           padding: padding,
           onEventHover: onEventHover,

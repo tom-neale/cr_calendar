@@ -214,6 +214,7 @@ class CrCalendar extends StatefulWidget {
     this.eventBuilder,
     this.touchMode = TouchMode.singleTap,
     this.eventsTopPadding = 12.0,
+    this.eventsBottomPadding = 0,
     this.onRangeSelected,
     this.onSwipeCallbackDebounceMs = 100,
     this.minDate,
@@ -290,6 +291,14 @@ class CrCalendar extends StatefulWidget {
 
   /// Padding over events widgets to for correction of their alignment.
   final double eventsTopPadding;
+
+  /// Padding reserved at the **bottom** of each cell that bars never
+  /// extend into. Defaults to 0 (legacy behaviour: bars fill the cell
+  /// from [eventsTopPadding] down to the cell bottom). Useful when the
+  /// host renders a custom indicator (e.g. an "+N more" overflow chip)
+  /// in the cell's bottom slice and needs the events overlay to leave
+  /// that region untouched.
+  final double eventsBottomPadding;
 
   /// Touch mode of calendar.
   ///
@@ -403,6 +412,7 @@ class _CrCalendarState extends State<CrCalendar> {
               color: widget.backgroundColor,
               child: MonthItem(
                 eventTopPadding: widget.eventsTopPadding,
+                eventBottomPadding: widget.eventsBottomPadding,
                 displayMonth: month,
                 controller: widget.controller,
                 eventBuilder: widget.eventBuilder,
