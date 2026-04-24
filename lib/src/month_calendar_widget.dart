@@ -197,6 +197,7 @@ class MonthCalendarWidgetState extends State<MonthCalendarWidget> {
         },
         child: DayItemWidget(
           width: widget.itemWidth,
+          height: widget.itemHeight,
           body: widget.dayItemBuilder != null
               ? widget.dayItemBuilder?.call(
                   DayItemProperties(
