@@ -21,6 +21,7 @@ class MonthItem extends StatefulWidget {
     this.currentDay,
     this.onDaySelected,
     this.dayItemBuilder,
+    this.dayForegroundBuilder,
     this.forceSixWeek = false,
     this.eventBuilder,
     this.onRangeSelected,
@@ -44,6 +45,17 @@ class MonthItem extends StatefulWidget {
   final Function(Jiffy)? onDayTap;
   final WeekDaysBuilder? weekDaysBuilder;
   final DayItemBuilder? dayItemBuilder;
+
+  /// Optional per-cell builder rendered as a third layer ABOVE the
+  /// events overlay. Useful for cell elements (e.g. an availability
+  /// pill) that must visually sit on top of trip bars rather than be
+  /// covered by them — the default [dayItemBuilder] renders behind
+  /// events because the events overlay sits later in the Stack.
+  ///
+  /// Receives the same [DayItemProperties] as [dayItemBuilder]; the
+  /// foreground grid is wrapped in [IgnorePointer], so taps still go
+  /// to the background cell.
+  final DayItemBuilder? dayForegroundBuilder;
   final bool forceSixWeek;
   final EventBuilder? eventBuilder;
   final CrCalendarController controller;
@@ -171,6 +183,21 @@ class MonthItemState extends State<MonthItem> {
                                 // can fire; otherwise preserve the original
                                 // pointer-through behaviour.
                                 _buildEventsLayer(itemWidth, itemHeight),
+                                // Optional foreground cell grid — renders
+                                // on TOP of the events overlay so callers
+                                // (e.g. an availability pill) can sit
+                                // visually above trip bars. Wrapped in
+                                // IgnorePointer so the underlying cell
+                                // still receives taps; identical geometry
+                                // to the background grid via the same
+                                // MonthCalendarWidget layout.
+                                if (widget.dayForegroundBuilder != null)
+                                  IgnorePointer(
+                                    child: _getMonthCalendarForeground(
+                                      itemWidth,
+                                      itemHeight,
+                                    ),
+                                  ),
                               ],
                             );
                     },
@@ -251,6 +278,42 @@ class MonthItemState extends State<MonthItem> {
       onDayTap: widget.onDayTap,
       onDaySelected: widget.onDaySelected,
       onRangeSelected: widget.onRangeSelected,
+      touchMode: widget.touchMode,
+      weeksToShow: widget.weeksToShow ?? Contract.kWeeksToShowInMonth,
+      bandRange: widget.bandRange,
+    );
+  }
+
+  /// Builds the foreground MonthCalendarWidget — identical geometry to
+  /// the background grid but drives cells from [MonthItem.dayForegroundBuilder].
+  /// The caller wraps this in IgnorePointer; taps are handled by the
+  /// background instance only.
+  MonthCalendarWidget _getMonthCalendarForeground(
+      double itemWidth, double itemHeight) {
+    return MonthCalendarWidget(
+      controller: widget.controller,
+      // No key here — using _monthKey on both grids would clash. The
+      // foreground grid does not need to retain GlobalKey-style
+      // identity since it carries no scroll/selection state of its own.
+      itemWidth: itemWidth,
+      itemHeight: itemHeight,
+      currentDay: widget.currentDay,
+      dayItemBuilder: widget.dayForegroundBuilder,
+      begin: _beginRange,
+      end: _endRange,
+      daysInMonth: _daysInMonth,
+      beginOffset: _beginOffset,
+      overflowedEvents: _overflowedEvents,
+      weekCount: _weekCount,
+      // No-op tap callbacks — IgnorePointer wraps this grid so the
+      // GestureDetectors inside never fire. Stubs are required because
+      // MonthCalendarWidget marks these parameters as required; even if
+      // the IgnorePointer wrapper were removed, an empty closure here
+      // keeps the foreground grid from double-handling taps already
+      // serviced by the background grid. onDayTap is optional and left
+      // unset.
+      onDaySelected: (_, __) {},
+      onRangeSelected: (_) {},
       touchMode: widget.touchMode,
       weeksToShow: widget.weeksToShow ?? Contract.kWeeksToShowInMonth,
       bandRange: widget.bandRange,

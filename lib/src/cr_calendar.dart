@@ -207,6 +207,7 @@ class CrCalendar extends StatefulWidget {
     this.onDayClicked,
     this.firstDayOfWeek = WeekDay.sunday,
     this.dayItemBuilder,
+    this.dayForegroundBuilder,
     this.forceSixWeek = false,
     this.autoScrollOnUnboundMonth = true,
     this.maxEventLines = 4,
@@ -269,6 +270,13 @@ class CrCalendar extends StatefulWidget {
 
   /// See [DayItemBuilder].
   final DayItemBuilder? dayItemBuilder;
+
+  /// Optional per-cell builder rendered as a third layer above the
+  /// events overlay. Cells produced by this builder sit visually on
+  /// top of trip bars and receive no pointer events (wrapped in
+  /// IgnorePointer); taps still go to the background [dayItemBuilder].
+  /// Geometry mirrors the background grid exactly.
+  final DayItemBuilder? dayForegroundBuilder;
 
   /// Force calendar to display sixth row in month view even if this week is
   /// not in current month.
@@ -459,6 +467,7 @@ class _CrCalendarState extends State<CrCalendar> {
                 },
                 weekDaysBuilder: widget.weekDaysBuilder,
                 dayItemBuilder: widget.dayItemBuilder,
+                dayForegroundBuilder: widget.dayForegroundBuilder,
                 weeksToShow: widget.weeksToShow,
                 firstWeekDay: _firstWeekDay,
                 localizedWeekDaysBuilder: widget.localizedWeekDaysBuilder,
