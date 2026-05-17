@@ -225,6 +225,7 @@ class CrCalendar extends StatefulWidget {
     this.localizedWeekDaysBuilder,
     this.onEventHover,
     this.bandRange,
+    this.physics,
     super.key,
   })  : assert(maxEventLines <= 6, 'maxEventLines should be less then 6'),
         assert(minDate == null || maxDate == null || minDate.isBefore(maxDate),
@@ -373,6 +374,12 @@ class CrCalendar extends StatefulWidget {
   /// can paint a tinted background for those cells.
   final DateRangeModel? bandRange;
 
+  /// Physics applied to the internal month [PageView]. Defaults to
+  /// Flutter's [PageScrollPhysics] (requires ~50 % drag or a sharp fling
+  /// to advance). Hosts can pass a custom [ScrollPhysics] (e.g. a
+  /// subclass with a lower snap threshold) for snappier page changes.
+  final ScrollPhysics? physics;
+
   @override
   _CrCalendarState createState() => _CrCalendarState();
 }
@@ -425,6 +432,7 @@ class _CrCalendarState extends State<CrCalendar> {
         return PageView.builder(
           itemCount: _minPage + widget.controller._maxPage,
           controller: widget.controller._getUpdatedPageController(),
+          physics: widget.physics,
           itemBuilder: (context, index) {
             final offset = index - widget.controller._initialPage;
             final month = Jiffy.parseFromDateTime(_initialDate)
