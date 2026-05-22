@@ -55,19 +55,13 @@ class EventsOverlay extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListView.builder(
       physics: const NeverScrollableScrollPhysics(),
+      // Fixed per-row height — letting ListView skip per-item measurement
+      // cuts layout work on rebuilds.
+      itemExtent: itemHeight,
       itemCount: weekList.length,
       itemBuilder: (context, index) {
         final week = weekList[index];
-        // Highest non-empty track index + 1. placeEventsToLines packs
-        // greedily from track 0 upward, so an empty intermediate track
-        // never occurs and this is equivalent to a count of non-empty
-        // entries.
-        var activeLines = 0;
-        for (var i = 0; i < week.lines.length; i++) {
-          if (week.lines[i].events.isNotEmpty) {
-            activeLines = i + 1;
-          }
-        }
+        final activeLines = week.activeLines;
         // Empty weeks divide by 1 to dodge a div-by-zero; nothing is
         // rendered anyway so the chosen value is cosmetic.
         final divisor = activeLines == 0 ? 1 : activeLines;

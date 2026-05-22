@@ -4,9 +4,25 @@ import 'package:cr_calendar/cr_calendar.dart';
 import 'package:flutter/material.dart';
 
 final class WeekDrawer {
-  WeekDrawer(this.lines);
+  WeekDrawer(this.lines) : activeLines = _countActiveLines(lines);
 
   List<EventsLineDrawer> lines;
+
+  /// Highest non-empty track index + 1. placeEventsToLines packs greedily
+  /// from track 0 upward, so an empty intermediate track never occurs and
+  /// this is equivalent to a count of non-empty entries. Precomputed at
+  /// build time so EventsOverlay doesn't recount on every frame.
+  final int activeLines;
+
+  static int _countActiveLines(List<EventsLineDrawer> lines) {
+    var active = 0;
+    for (var i = 0; i < lines.length; i++) {
+      if (lines[i].events.isNotEmpty) {
+        active = i + 1;
+      }
+    }
+    return active;
+  }
 }
 
 final class EventsLineDrawer {

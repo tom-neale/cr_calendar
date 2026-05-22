@@ -371,11 +371,16 @@ class MonthItemState extends State<MonthItem> {
 
     final drawersForWeek = <List<EventProperties>>[];
 
+    // Materialize UTC-midnight bounds ONCE per render. resolveEventDrawersForWeek
+    // is called per week (typically 6 times); without this hoist, every week
+    // rebuilds DateTime.utc + Jiffy for every event — ~209ms at 200 events.
+    final precomputed = precomputeEventBounds(widget.controller.events ?? []);
+
     final weeks = List.generate(_weekCount, (index) {
       final eventDrawers = resolveEventDrawersForWeek(
         widget.weeksToShow != null ? widget.weeksToShow![index] : index,
         _beginRange,
-        widget.controller.events ?? [],
+        precomputed,
       );
       final placedEvents =
           placeEventsToLines(eventDrawers, widget.maxEventLines);
