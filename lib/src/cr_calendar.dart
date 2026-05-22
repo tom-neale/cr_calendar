@@ -315,12 +315,16 @@ class CrCalendar extends StatefulWidget {
   final double eventsBottomPadding;
 
   /// Optional builder that computes [eventsBottomPadding] dynamically
-  /// from the per-frame `itemHeight` and `maxLines`. Takes precedence
-  /// over [eventsBottomPadding] when supplied. Use when the bottom
-  /// reserve must equal the bar height (e.g. so an overflow chip
-  /// rendered by the host has the same vertical footprint as a real
-  /// bar regardless of how the calendar resizes).
-  final double Function(double itemHeight, int maxLines)?
+  /// **per week**. Called once per rendered week with the cell height
+  /// and that week's `activeLines` — the count of tracks the week
+  /// actually occupies (0 when the week has no events). Takes
+  /// precedence over [eventsBottomPadding] when supplied.
+  ///
+  /// Per-week invocation pairs with the per-week bar sizing in
+  /// [EventsOverlay]: a host can cap lone-track bars at a fixed
+  /// pixel height while busy weeks still fill the full cell by
+  /// returning a non-zero padding only when `activeLines == 1`.
+  final double Function(double itemHeight, int activeLines)?
       eventsBottomPaddingBuilder;
 
   /// Touch mode of calendar.

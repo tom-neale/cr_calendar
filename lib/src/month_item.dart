@@ -67,10 +67,11 @@ class MonthItem extends StatefulWidget {
   /// indicator (e.g. "+N more") in the cell's bottom slice.
   final double eventBottomPadding;
 
-  /// Optional dynamic-padding builder. Computed per-frame from the
-  /// actual `itemHeight` and `maxLines` if supplied — takes
-  /// precedence over the static [eventBottomPadding].
-  final double Function(double itemHeight, int maxLines)?
+  /// Optional dynamic-padding builder. Invoked per week with the cell
+  /// height and that week's `activeLines` (count of occupied tracks).
+  /// Takes precedence over the static [eventBottomPadding]. See
+  /// [CrCalendar.eventsBottomPaddingBuilder] for rationale.
+  final double Function(double itemHeight, int activeLines)?
       eventBottomPaddingBuilder;
 
   final TouchMode touchMode;
@@ -239,14 +240,16 @@ class MonthItemState extends State<MonthItem> {
   Widget _buildEventsLayer(double itemWidth, double itemHeight) {
     final topPadding = widget.eventTopPadding ??
         (itemHeight / Contract.kDayItemTopPaddingCoef);
-    final bottomPadding = widget.eventBottomPaddingBuilder
-            ?.call(itemHeight, widget.maxEventLines) ??
-        widget.eventBottomPadding;
     final overlay = EventsOverlay(
       eventBuilder: widget.eventBuilder,
       maxLines: widget.maxEventLines,
       topPadding: topPadding,
-      bottomPadding: bottomPadding,
+      defaultBottomPadding: widget.eventBottomPadding,
+      // Passed through so EventsOverlay can call it once per week with
+      // the week's active-line count — required for per-week bar
+      // sizing where a lone-track bar caps at a fixed height while
+      // busy weeks fill the cell.
+      bottomPaddingBuilder: widget.eventBottomPaddingBuilder,
       itemWidth: itemWidth,
       itemHeight: itemHeight,
       begin: _beginRange,

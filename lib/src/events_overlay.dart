@@ -13,7 +13,8 @@ class EventsOverlay extends StatelessWidget {
     required this.topPadding,
     required this.itemHeight,
     required this.maxLines,
-    this.bottomPadding = 0,
+    this.defaultBottomPadding = 0,
+    this.bottomPaddingBuilder,
     this.padding,
     this.eventBuilder,
     this.onEventHover,
@@ -26,12 +27,25 @@ class EventsOverlay extends StatelessWidget {
   final double itemHeight;
   final double topPadding;
 
-  /// Vertical padding reserved at the bottom of each cell — bars never
-  /// extend into this region, so a host can paint custom content there
-  /// (e.g. an overflow indicator chip) without the events overlay
-  /// covering it.
-  final double bottomPadding;
+  /// Bottom padding to apply when [bottomPaddingBuilder] is null. Bars
+  /// stop short of the cell bottom by this amount on every week,
+  /// leaving the bottom strip available for the host's overflow
+  /// indicator.
+  final double defaultBottomPadding;
 
+  /// Per-week bottom padding. Called with the cell height and the
+  /// active-line count for the week being rendered (the highest
+  /// non-empty track index + 1, or 0 if the week has no events). When
+  /// supplied, this takes precedence over [defaultBottomPadding] and
+  /// lets the host vary the reserved bottom strip — typically to cap a
+  /// lone-track bar at a fixed pixel height while keeping busy weeks
+  /// at their natural full-cell allocation.
+  final double Function(double itemHeight, int activeLines)?
+      bottomPaddingBuilder;
+
+  /// Global track cap. Drives event packing (events beyond this cap
+  /// are dropped and reported as overflow); per-week bar height is
+  /// derived from the actual occupied track count, not this value.
   final int maxLines;
   final EdgeInsets? padding;
   final EventBuilder? eventBuilder;
@@ -43,13 +57,30 @@ class EventsOverlay extends StatelessWidget {
       physics: const NeverScrollableScrollPhysics(),
       itemCount: weekList.length,
       itemBuilder: (context, index) {
+        final week = weekList[index];
+        // Highest non-empty track index + 1. placeEventsToLines packs
+        // greedily from track 0 upward, so an empty intermediate track
+        // never occurs and this is equivalent to a count of non-empty
+        // entries.
+        var activeLines = 0;
+        for (var i = 0; i < week.lines.length; i++) {
+          if (week.lines[i].events.isNotEmpty) {
+            activeLines = i + 1;
+          }
+        }
+        // Empty weeks divide by 1 to dodge a div-by-zero; nothing is
+        // rendered anyway so the chosen value is cosmetic.
+        final divisor = activeLines == 0 ? 1 : activeLines;
+        final bottomPadding =
+            bottomPaddingBuilder?.call(itemHeight, activeLines) ??
+                defaultBottomPadding;
         final lineHeight =
-            (itemHeight - topPadding - bottomPadding) / maxLines;
+            (itemHeight - topPadding - bottomPadding) / divisor;
 
         return WeekEventsWidget(
           eventBuilder: eventBuilder,
           row: index,
-          eventLines: weekList[index].lines,
+          eventLines: week.lines,
           itemHeight: itemHeight,
           itemWidth: itemWidth,
           topPadding: topPadding,
